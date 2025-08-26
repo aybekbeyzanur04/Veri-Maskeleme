@@ -1,64 +1,83 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Veri Maskeleme Uygulaması</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f0f5;
+      background: #e0e0e0;  /* açık gri arka plan */
       padding: 20px;
       display: flex;
       justify-content: center;
+      min-height: 100vh;
+      align-items: center;
     }
 
     .container {
-      background: #fff;
-      padding: 25px 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: #f9f9f9;  /* biraz açık beyaz */
+      padding: 30px 35px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       width: 400px;
     }
 
     h2 {
       text-align: center;
       color: #333;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      color: #555;
+      display: block;
+      margin-bottom: 8px;
     }
 
     input, textarea {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
+      padding: 10px 12px;
+      margin-bottom: 15px;
       font-size: 16px;
+      border: 1.8px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s ease;
+    }
+    input:focus, textarea:focus {
+      border-color: #6c63ff; /* morumsu mavi odak rengi */
+      outline: none;
     }
 
     button {
       width: 48%;
-      padding: 10px;
+      padding: 11px 0;
       font-size: 16px;
-      background-color: #e91e63; /* Pembe */
+      background-color: #6c63ff; /* morumsu mavi */
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
       margin: 5px 1%;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 3px 6px rgba(108, 99, 255, 0.5);
     }
 
     button:hover {
-      background-color: #c2185b; /* Koyu pembe */
+      background-color: #574fd6; /* koyu mor */
+      box-shadow: 0 4px 12px rgba(87, 79, 214, 0.7);
     }
 
     .output {
       margin-top: 15px;
-      padding: 10px;
-      background-color: #f9f9f9;
-      border-left: 4px solid #2196f3;
-      border-radius: 5px;
+      padding: 12px 15px;
+      background-color: #e1e3f8; /* açık morumsu gri */
+      border-left: 4px solid #6c63ff;
+      border-radius: 6px;
       word-break: break-word;
-    }
-
-    label {
-      font-weight: bold;
+      min-height: 40px;
+      color: #333;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -67,7 +86,7 @@
     <h2>🔐 Veri Maskeleme Uygulaması</h2>
 
     <label for="inputText">Metin Gir:</label>
-    <input type="text" id="inputText" placeholder="Gizlenecek veya çözülecek metin">
+    <input type="text" id="inputText" placeholder="Gizlenecek veya çözülecek metin" />
 
     <div style="display: flex; justify-content: space-between;">
       <button onclick="sifrele()">Şifrele</button>
@@ -78,13 +97,28 @@
   </div>
 
   <script>
+    // Unicode destekli Base64 encode
+    function base64EncodeUnicode(str) {
+      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+        function(match, p1) {
+          return String.fromCharCode('0x' + p1);
+        }));
+    }
+
+    // Unicode destekli Base64 decode
+    function base64DecodeUnicode(str) {
+      return decodeURIComponent(atob(str).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+    }
+
     function sifrele() {
       const input = document.getElementById("inputText").value;
       if (input.trim() === "") {
         alert("Lütfen şifrelenecek metni girin.");
         return;
       }
-      const encoded = btoa(input); // Base64 şifreleme
+      const encoded = base64EncodeUnicode(input);
       document.getElementById("sonuc").innerHTML = `<strong>Şifrelenmiş:</strong><br>${encoded}`;
     }
 
@@ -95,7 +129,7 @@
         return;
       }
       try {
-        const decoded = atob(input); // Base64 çözme
+        const decoded = base64DecodeUnicode(input);
         document.getElementById("sonuc").innerHTML = `<strong>Deşifre Edilmiş:</strong><br>${decoded}`;
       } catch (e) {
         document.getElementById("sonuc").innerHTML = `<span style="color: red;">❌ Geçersiz şifreli veri!</span>`;
